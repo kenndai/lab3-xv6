@@ -224,6 +224,7 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz) //newsz = sz + 2*PGSIZE
   char *mem;
   uint a;
 
+  // Lab3
   if(newsz >= KERNBASE)
     return 0;
   if(newsz < oldsz)
@@ -327,7 +328,6 @@ copyuvm(pde_t *pgdir, uint sz)
 
   // copys from 0 to sz in PGSIZE increments
   for(i = 0; i < sz; i += PGSIZE){
-      cprintf("value of i: %d\n", i);
       if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
       panic("copyuvm: pte should exist");
     if(!(*pte & PTE_P))
@@ -343,7 +343,6 @@ copyuvm(pde_t *pgdir, uint sz)
 
   // Lab3: copy stack and page guard
     for(i = STACKTOP - 2*PGSIZE + 1; i < STACKTOP; i += PGSIZE){
-        cprintf("value of i: %d\n", i);
         if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
             panic("copyuvm: pte should exist");
         if(!(*pte & PTE_P)) { // Lab3: the Present PTE flag is missing
