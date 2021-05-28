@@ -181,7 +181,7 @@ int
 fork(void)
 {
   int i, pid;
-  struct proc *np;
+  struct proc *np; //new process
   struct proc *curproc = myproc();
 
   // Allocate process.

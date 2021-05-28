@@ -17,7 +17,7 @@
 int
 fetchint(uint addr, int *ip)
 {
-  struct proc *curproc = myproc();
+//  struct proc *curproc = myproc();
 
   // Lab3: stackPointer is pointing to top of user address, KERNBASE - 1
   if(addr >= KERNBASE-1 || addr+4 > KERNBASE-1)
@@ -61,7 +61,7 @@ int
 argptr(int n, char **pp, int size)
 {
   int i;
-  struct proc *curproc = myproc();
+//  struct proc *curproc = myproc();
  
   if(argint(n, &i) < 0)
     return -1;

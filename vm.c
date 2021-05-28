@@ -312,6 +312,8 @@ clearpteu(pde_t *pgdir, char *uva)
 
 // Given a parent process's page table, create a copy
 // of it for a child.
+// Lab3: child needs to have same virtual address space as parent
+// Lab3: need to copy user text and data + heap and stack + page guard
 pde_t*
 copyuvm(pde_t *pgdir, uint sz)
 {
@@ -322,11 +324,14 @@ copyuvm(pde_t *pgdir, uint sz)
 
   if((d = setupkvm()) == 0)
     return 0;
+
+  // copys from 0 to sz in PGSIZE increments
   for(i = 0; i < sz; i += PGSIZE){
-    if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
+      cprintf("value of i: %d\n", i);
+      if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
       panic("copyuvm: pte should exist");
     if(!(*pte & PTE_P))
-      panic("copyuvm: page not present");
+        panic("copyuvm: page not present");
     pa = PTE_ADDR(*pte);
     flags = PTE_FLAGS(*pte);
     if((mem = kalloc()) == 0)
@@ -335,6 +340,24 @@ copyuvm(pde_t *pgdir, uint sz)
     if(mappages(d, (void*)i, PGSIZE, V2P(mem), flags) < 0)
       goto bad;
   }
+
+  // Lab3: copy stack and page guard
+    for(i = STACKTOP - 2*PGSIZE + 1; i < STACKTOP; i += PGSIZE){
+        cprintf("value of i: %d\n", i);
+        if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
+            panic("copyuvm: pte should exist");
+        if(!(*pte & PTE_P)) { // Lab3: the Present PTE flag is missing
+            panic("copyuvm: page not present");
+        }
+        pa = PTE_ADDR(*pte);
+        flags = PTE_FLAGS(*pte);
+        if((mem = kalloc()) == 0)
+            goto bad;
+        memmove(mem, (char*)P2V(pa), PGSIZE);
+        if(mappages(d, (void*)i, PGSIZE, V2P(mem), flags) < 0)
+            goto bad;
+    }
+
   return d;
 
 bad:
