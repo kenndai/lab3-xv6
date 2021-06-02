@@ -353,7 +353,7 @@ copyuvm(pde_t *pgdir, uint sz)
   }
 
   // Lab3: copy stack and page guard
-    for(i = STACKTOP - 2*PGSIZE + 1; i < STACKTOP; i += PGSIZE){
+    for(i = STACKTOP - (myproc()->stackPages + 1)*PGSIZE + 1; i < STACKTOP; i += PGSIZE){
         if((pte = walkpgdir(pgdir, (void *) i, 0)) == 0)
             panic("copyuvm: pte should exist");
         if(!(*pte & PTE_P)) { // Lab3: the Present PTE flag is missing
