@@ -39,7 +39,7 @@ fetchstr(uint addr, char **pp)
   if(addr >= STACKTOP)
     return -1;
   *pp = (char*)addr;
-  ep = (char*)curproc->sz;
+  ep = (char*)STACKTOP;
   for(s = *pp; s < ep; s++){
     if(*s == 0)
       return s - *pp;
