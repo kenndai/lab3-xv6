@@ -304,11 +304,22 @@ void
 clearpteu(pde_t *pgdir, char *uva)
 {
   pte_t *pte;
-
   pte = walkpgdir(pgdir, uva, 0);
   if(pte == 0)
     panic("clearpteu");
   *pte &= ~PTE_U;
+}
+
+// Lab3: Function to re-set PTE_U
+void
+setpteu(pde_t *pgdir, char *uva)
+{
+  pte_t *pte;
+
+  pte = walkpgdir(pgdir, uva, 0);
+  if(pte == 0)
+    panic("setpteu");
+  *pte |= PTE_U; //bitwise OR instead of AND to set the bit
 }
 
 // Given a parent process's page table, create a copy

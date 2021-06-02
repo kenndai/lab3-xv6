@@ -36,6 +36,9 @@ idtinit(void)
 void
 trap(struct trapframe *tf)
 {
+    // Lab3
+  struct proc *curproc = myproc();
+
   if(tf->trapno == T_SYSCALL){
     if(myproc()->killed)
       exit();
@@ -77,6 +80,21 @@ trap(struct trapframe *tf)
             cpuid(), tf->cs, tf->eip);
     lapiceoi();
     break;
+
+  // Lab3: Page Fault Case
+  // if CR is right under the current bottom of the stack, allocate new page
+  case T_PGFLT:
+      if (rcr2() < curproc->stackBottom) { //checks if address is within page guard
+        if (allocuvm(curproc->pgdir, curproc->pgBottom - 1 - PGSIZE, curproc->pgBottom - 1) != 0) {
+            setpteu(curproc->pgdir, (char*) curproc->pgBottom); // resets PTE_U in old page guard
+            clearpteu(curproc->pgdir, (char*) curproc->pgBottom - 1 - PGSIZE); // clears PTE_U in new page guard
+            // update proc variables
+            curproc->stackBottom = curproc->pgBottom;
+            curproc->pgBottom = curproc->pgBottom - 1 - PGSIZE;
+            curproc->stackPages++;
+        }
+      }
+      break;
 
   //PAGEBREAK: 13
   default:
