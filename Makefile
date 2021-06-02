@@ -178,6 +178,7 @@ UPROGS=\
 	_shm_cnt\
 	_null\
 	_prog1\
+    _overflow\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
