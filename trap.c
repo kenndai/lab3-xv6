@@ -87,7 +87,7 @@ trap(struct trapframe *tf)
       if (rcr2() < curproc->stackBottom) { //checks if address is within page guard
         if (allocuvm(curproc->pgdir, curproc->pgBottom - 1 - PGSIZE, curproc->pgBottom - 1) != 0) {
             setpteu(curproc->pgdir, (char*) curproc->pgBottom); // resets PTE_U in old page guard
-            clearpteu(curproc->pgdir, (char*) curproc->pgBottom - 1 - PGSIZE); // clears PTE_U in new page guard
+            clearpteu(curproc->pgdir, (char*) (curproc->pgBottom - 1 - PGSIZE)); // clears PTE_U in new page guard
             // update proc variables
             curproc->stackBottom = curproc->pgBottom;
             curproc->pgBottom = curproc->pgBottom - 1 - PGSIZE;
