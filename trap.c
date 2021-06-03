@@ -85,13 +85,15 @@ trap(struct trapframe *tf)
   // if CR is right under the current bottom of the stack, allocate new page
   case T_PGFLT:
       if (rcr2() < curproc->stackBottom) { //checks if address is within page guard
-        if (allocuvm(curproc->pgdir, curproc->pgBottom - 1 - PGSIZE, curproc->pgBottom - 1) != 0) {
+        if (allocuvm(curproc->pgdir, curproc->pgBottom - PGSIZE, curproc->pgBottom) != 0) {
             setpteu(curproc->pgdir, (char*) curproc->pgBottom); // resets PTE_U in old page guard
-            clearpteu(curproc->pgdir, (char*) (curproc->pgBottom - 1 - PGSIZE)); // clears PTE_U in new page guard
+            clearpteu(curproc->pgdir, (char*) (curproc->pgBottom - PGSIZE)); // clears PTE_U in new page guard
             // update proc variables
             curproc->stackBottom = curproc->pgBottom;
-            curproc->pgBottom = curproc->pgBottom - 1 - PGSIZE;
+            curproc->pgBottom = curproc->pgBottom - PGSIZE;
             curproc->stackPages++;
+            cprintf("Increased stack size!\n");
+            cprintf("Current amount of stack pages: %d\n\n", curproc->stackPages);
         }
       }
       break;
